@@ -21,4 +21,9 @@ G = ztrans(F_t);
 %Z transfer function of F
 num = sym2poly(n);
 denom = sym2poly(d);
+F_z =filt(num, denom);
 
+Gp_z = c2d(Gp, 0.05);
+temp = filt([1 -1], [1 0], 0.05);
+Gp_final = Gp_z*temp;
+Gp_final = Gp_final*0.46/9187;

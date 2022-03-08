@@ -15,5 +15,4 @@ while(true)
    i = i -1;
 end
 Settling = t(settlingIndex) -1;
-plot(t, SimData{1}); hold on; 
-yline(58-0.25); yline(58+0.25);
+plot(SimData{1})
