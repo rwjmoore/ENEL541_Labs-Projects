@@ -30,6 +30,4 @@ denominator = sym2poly(denom);
 Gp_z = filt(numerator, denominator, T);
 Gp_closedLoop = Gp_z/(1 +Gp_z);
 
-model = feedback(Gp_z, 1);
-model
-Gp_z
+model = feedback(Gp_z, -1);
