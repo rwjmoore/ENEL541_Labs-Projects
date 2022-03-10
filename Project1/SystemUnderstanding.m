@@ -6,11 +6,12 @@ Gp1 = tf(num, denom); %s domain without electric motor transients
 
 Gp_Plant = tf([12], [1 1.5 0]);
 
-%find the bandwidth of the system 
+%find the bandwidth of the system (without power amplifier) 
 Gp_Plants= feedback(Gp_Plant, 1);
 bandwid = bandwidth(Gp_Plants);
 
-
+Gp_Total = tf([1200], [1 101.5 150 0]);
+bandwid_total = bandwidth(feedback(Gp_Total, 1));
 
 %find inverse laplace of F (symbolic math, doesnt include sampling times)
 syms s t
@@ -59,6 +60,15 @@ clear angle
 
 %Calculate the phase deficiency between our desired pole and the current
 %transfer function setup. 
-x = evalfr(model, 0.6+0.2i);
-Ph =angle(x)*360/(2*pi);
+y = 0.1;
+x = 0.75;
+g = evalfr(model, 0.1+0.75i);
+Ph =angle(g)*360/(2*pi);
 deficiency = 180 - Ph;
+
+
+%calculated zero position for controller
+position = x + y/(tan(pi - deficiency*2*pi/360))
+
+
+%calculate magnitude of 1/Gp_z
