@@ -20,14 +20,16 @@ G = ztrans(F_t);
 %simplify the z transform function
 syms z 
 T = 0.05; %sample rate
-f (z) = (z*(8*T - 16/3*(1-exp(-1.5*T))) - 16/3 - exp(-1.5*T) - 8*T*exp(-1.5*T))/ ( (z-1)*(z-exp(-1.5*T)) );
+f (z) = 16/3*( (3/2*T-1+exp(-1.5*T))*z^2 + (1-exp(-1.5*T)-3/2*T*exp(-1.5*T)) ) / ( (z-1)*(z-exp(-1.5*T) ) );
 
 
 %Z transfer function of F 
 [num, denom] = numden(f);
 numerator = sym2poly(num);
 denominator = sym2poly(denom);
-Gp_z = filt(numerator, denominator, T);
+Gp_z = tf(numerator, denominator, T);
 Gp_closedLoop = Gp_z/(1 +Gp_z);
 
-model = feedback(Gp_z, -1);
+model = feedback(Gp_z, 1, -1);
+model
+Gp_z

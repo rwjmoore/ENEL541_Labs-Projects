@@ -4,6 +4,11 @@ denom = [1 1.5 0 0]; %accomodate for 1/s input for staircase formula (added a 1/
 
 Gp1 = tf(num, denom); %s domain without electric motor transients
 
+Gp_Plant = tf([12], [1 1.5 0]);
+
+%find the bandwidth of the system 
+Gp_Plants= feedback(Gp_Plant, 1);
+bandwid = bandwidth(Gp_Plants);
 
 
 
@@ -17,19 +22,43 @@ G = ztrans(F_t);
 [n, d ] = numden(G);
 %End of symbolic math: symbolic math just for reference
 
-%simplify the z transform function
+%simplify the z transform function calculation
 syms z 
 T = 0.05; %sample rate
-f (z) = (z*(8*T - 16/3*(1-exp(-1.5*T))) - 16/3 - exp(-1.5*T) - 8*T*exp(-1.5*T))/ ( (z-1)*(z-exp(-1.5*T)) );
+f (z) = 16/3*( (3/2*T-1+exp(-1.5*T))*z^2 + (1-exp(-1.5*T)-3/2*T*exp(-1.5*T)) ) / ( (z-1)*(z-exp(-1.5*T) ) );
 
 
 %Z transfer function of F 
 [num, denom] = numden(f);
 numerator = sym2poly(num);
 denominator = sym2poly(denom);
-Gp_z = filt(numerator, denominator, T);
-Gp_closedLoop = Gp_z/(1 +Gp_z);
+Gp_z = tf(numerator, denominator, T);
 
-model = feedback(Gp_z, 1);
-model
-Gp_z
+%model is the closed loop z transfer function 
+model = feedback(Gp_z, 1, -1);
+p = pole(model);
+zer = zero(model);
+p
+zer
+hold on;
+% PlotCircle_1.m:   Plot a circle of radius 1 centered at the origin
+% n: number of points
+
+n = 50;
+
+angle = 0:2*pi/n:2*pi;            % vector of angles at which points are drawn
+R = 0.96078;                            % Unit radius
+
+x = R*cos(angle);  y = R*sin(angle);   % Coordinates of the circle
+plot(x,y);                             % Plot the circle
+
+axis equal;
+grid on;
+rlocus(model);
+clear angle
+
+%Calculate the phase deficiency between our desired pole and the current
+%transfer function setup. 
+x = evalfr(model, 0.6+0.2i);
+Ph =angle(x)*360/(2*pi);
+deficiency = 180 - Ph;
