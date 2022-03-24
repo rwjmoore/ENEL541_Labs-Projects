@@ -1,0 +1,38 @@
+tsim = out.tout;
+
+Ts = 1/200; 
+[SimData, t] =SampleDataStream(out, Ts);
+
+Gs = CartPend(2);
+Gz = c2d(Gs, 1/200); 
+u = SimData{1};
+y1 = lsim(Gs, u, t);
+
+GPoles = pole(Gz);
+figure; 
+zgrid on
+plot(GPoles, 'rx', 'markersize',16);
+PoMag = 0.85; 
+
+Po = PoMag * [exp(j*pi/4) exp(-j*pi/4) exp(j*pi/3) exp(-j*pi/3)];
+A = Gz.a;
+B = Gz.b;
+C = Gz.c;
+D = Gz.d
+
+L = place(A', C', Po)';
+
+PendObs = ss(A-L*C,[B-L*D, L],eye(4),zeros(4,3),Ts);
+
+%test the observer by starting model in random place
+x0 = randn(4,1);
+%simulate response to chirp input 
+[y,tt,x] = lsim(Gz,u,t,x0);
+
+%now use observer to estimate the states given only input and ouput. 
+xobs0 = zeros(4,1)
+[yobs,tt,xobs] = lsim(PendObs,[u y],t,xobs0);
+%plotting 4 outputs of the observer, superimposed on the 4 states of the
+%simualted model 
+figure; 
+subplot(141); plot(x(:,1)); hold on; plot()

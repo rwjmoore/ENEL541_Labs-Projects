@@ -72,3 +72,9 @@ position = x + y/(tan(pi - deficiency*2*pi/360))
 
 
 %calculate magnitude of 1/Gp_z
+mag = evalfr(Gp_z, 0.75 + 0.1i);
+
+%Controller Transfer Function
+Gc = filt([1 -0.7301], [1 0], 0.05)
+
+
