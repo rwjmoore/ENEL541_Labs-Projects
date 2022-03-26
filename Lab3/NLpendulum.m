@@ -61,7 +61,7 @@ sizes.NumSampleTimes = 1;
 
 sys = simsizes(sizes);
 x0  = zeros(4,1);
-%x0(2) = 0.5;
+x0(2) = 0.5;
 str = [];
 ts  = [0 0];
 
