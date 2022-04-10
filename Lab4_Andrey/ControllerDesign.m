@@ -3,8 +3,8 @@
 
 Ts = 1/200;
 DampingGain = 3;             %FIX ME... Fixed April 4th by Andele
-%sys = CartPend(DampingGain);
-sys = InvPend(DampingGain);
+sys = CartPend(DampingGain);
+% sys = InvPend(DampingGain);
 sysd = c2d(sys,Ts);
 A = sysd.a;
 B = sysd.b;

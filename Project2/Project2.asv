@@ -32,8 +32,8 @@ d1 = det(Co);
 
 %here we create the continuous time state space of the plant 
 [nums, dens] = tfdata(Gp_Total);
-nums = cell2mat(nums); %convert to appropriate format (array)
-dens = cell2mat(dens); 
+num = cell2mat(numz); %convert to appropriate format (array)
+denz = cell2mat(denz); 
 [As, Bs, Cs, Ds] = tf2ss(nums, dens);
 
 
