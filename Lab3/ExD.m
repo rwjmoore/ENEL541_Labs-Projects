@@ -7,7 +7,7 @@ plot(GPoles, 'rx', 'markersize',16);
 %modifying pole position
 %calculating 2%settling time
 Pmags = abs(GPoles)
-T2s = 4*Ts./abs(log(Pmags))
+T2s = 2*Ts./abs(log(Pmags))
 Zmag = exp(-4*Ts); %new radius that the poles must be within for 5 second settling time
 
 %replace the integrator with a pole at z = Zmag

@@ -4,7 +4,7 @@
 
 %tf of plant without the power dynamics of the amplifier
 b = [12]; %numerator coefficients
-a = [1 1.5 0];
+a = [1 1.5 0 0];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
@@ -47,16 +47,16 @@ dens = cell2mat(dens);
 %tracking 
 Gpoles = pole(Gz_Total); 
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
-
+C = [0 0 1];
 %Select pole placement of 0.85 radius for now (short transients).
 PoMag = 0.01;
-Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
+Po = PoMag * [exp(j*pi/4) exp(-j*pi/4) 1];
 
 %place the new pole positions
 L = place(A',C',Po)';
 %notice that C is all ones and D is zero, meaning the output of observer
 %tracks the states
-DishObs = ss(A-L*C,[B-L*D, L],eye(2),zeros(2,2),Ts); %Observer system
+DishObs = ss(A-L*C,[B-L*D, L],eye(3),zeros(4,\4),Ts); %Observer system
 
 %RUN Project2_Observer 
 out = sim('Project2_Observer');

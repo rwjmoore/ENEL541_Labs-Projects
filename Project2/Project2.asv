@@ -15,30 +15,49 @@ denz = cell2mat(denz);
 sys = ss(A,B,C,D); 
 csys = canon(sys, 'companion'); 
 
-%check for observability
-Ob = obsv(A,C); %observability matrix
-d = det(Ob);
-%observability is very small, so we can look at the rank of the matrix and
-%compare this with the A matrix to determine if it is observable 
-unob = length(A)-rank(Ob);
-%since unob is 0, this means it is observable. 
+            %check for observability
+            Ob = obsv(A,C); %observability matrix
+            d = det(Ob);
+            %observability is very small, so we can look at the rank of the matrix and
+            %compare this with the A matrix to determine if it is observable 
+            unob = length(A)-rank(Ob);
+            %since unob is 0, this means it is observable. 
+            
+            %check for controllability
+            Co = ctrb(csys); %controllability matrix
+            d1 = det(Co); 
+            %controllability has passed! 
 
-%check for controllability
-Co = ctrb(csys); %controllability matrix
-d1 = det(Co); 
-%controllability has passed! 
 
 
-
-%here we create the continuous time state space of the plant 
+%here we create the continuous time state space of the plant to be used in
+%the simulink model 
 [nums, dens] = tfdata(Gp_Total);
-num = cell2mat(numz); %convert to appropriate format (array)
-denz = cell2mat(denz); 
+nums = cell2mat(nums); %convert to appropriate format (array)
+dens = cell2mat(dens); 
 [As, Bs, Cs, Ds] = tf2ss(nums, dens);
 
 
-% pole(Gz_Total);
-% tester = ss(Gz_Total);
 
+%this part of the script deals with the design of the discrete time
+%controller for the model 
 
+%%% OBSERVER DESIGN SECTION %%%
+%Our goal is to let the observer error decay rapidly to allow quick
+%tracking 
+Gpoles = pole(Gz_Total); 
+figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
 
+%Select pole placement of 0.85 radius for now (short transients).
+
+PoMag = 0.85;
+Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
+%place the new pole positions
+L = place(A',C',Po)';
+DishObs = ss(A-L*C,[B-L*D, L],eye(1),zeros(1,1),Ts);
+%test the observer 
+x0 = randn(2,1);
+[y,tt,x] = lsim(Gz_Total,u,t,x0); %actual data
+
+xobs0 = zeros(4,1);
+[yobs,tt,xobs] = lsim(PendObs,[u y],t,xobs0)

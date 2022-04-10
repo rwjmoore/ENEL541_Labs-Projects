@@ -47,9 +47,9 @@ dens = cell2mat(dens);
 %tracking 
 Gpoles = pole(Gz_Total); 
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
-
+% C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
-PoMag = 0.01;
+PoMag = 0.85;
 Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
 
 %place the new pole positions
@@ -63,8 +63,6 @@ out = sim('Project2_Observer');
 
 %test the observer 
 tsim = out.tout;
-
-
 [SimData, t] = SampleDataStream(out, Ts);
 
 %system inputs 
@@ -80,7 +78,6 @@ xobs0 = zeros(2,1);
 
 figure();
 subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("Observer Out"); legend('Observer', 'Real');
-
 subplot(122); plot(tt,yobs(:,2), tt, x(:,2)); title("Observer Out"); legend('Observer', 'Real');
 
 
