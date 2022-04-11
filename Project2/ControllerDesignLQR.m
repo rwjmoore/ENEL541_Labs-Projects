@@ -5,7 +5,6 @@
 
 Ts = 0.05;
 DampingGain = 3;             %Fixed April 4th by Andrey
-
 % model of the system continous state space modle
 % sys
 %
@@ -36,16 +35,16 @@ D = sys.D;
 
 
 % Default Observer Poles
-PoMag = 0.3;
+PoMag = 0.01;
 % TODO: get a better Observer Pole
 Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4)];
 
 L = place(A',C',Po)';
 
 % you must set these parameters 
-q1 = 10;
-q2 = 10;
-R = 1;
+q1 = 1000;
+q2 = 1000;
+R = 10;
 
 % call dlqr to compute the state feedback gain
 Q = diag([q1 q2]);

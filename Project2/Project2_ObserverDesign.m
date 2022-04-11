@@ -52,7 +52,9 @@ dens = cell2mat(dens);
 %Our goal is to let the observer error decay rapidly to allow quick
 %tracking 
 Gpoles = pole(Gz_Total); 
-figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
+Gpoles(1) = 1 + 0*j;
+Gpoles(2) = 0.927743486328552 + 0*j;
+figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); hold on;
 % C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
 PoMag = 0.85;
