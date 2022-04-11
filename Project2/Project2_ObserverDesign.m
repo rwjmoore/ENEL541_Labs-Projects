@@ -49,9 +49,10 @@ Gpoles = pole(Gz_Total);
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
 % C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
-PoMag = 0.85;
-Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
-
+PoMag = 0.60;
+Po = PoMag * [exp(j*pi/100) exp(-j*pi/100)];
+plot(Po, 'gx', 'markersize',16)
+legend('Plant Pole', 'Observer Pole')
 %place the new pole positions
 L = place(A',C',Po)';
 %notice that C is all ones and D is zero, meaning the output of observer
@@ -66,8 +67,9 @@ tsim = out.tout;
 [SimData, t] = SampleDataStream(out, Ts);
 
 %system inputs 
-u = SimData{3}; 
-x0 = randn(2,1);
+u = SimData{3}; %how do we know what our first states are? 
+x0 = randn(2,1); 
+%x0 = [1000000 1];
 
 %actual system results (non observer)
 [y,tt,x] = lsim(sys,u,t,x0); %sys here is the discrete time ss of the plant
@@ -75,6 +77,7 @@ x0 = randn(2,1);
 %observer results
 xobs0 = zeros(2,1);
 [yobs,tt,xobs] = lsim(DishObs,[u y],t,xobs0);
+
 
 figure();
 subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("Observer Out"); legend('Observer', 'Real');

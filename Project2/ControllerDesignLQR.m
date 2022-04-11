@@ -54,9 +54,9 @@ K = dlqr(A,B,Q,R);
 Asfo = A - L*C;
 Bsfo = [B-(L*D), L];
 Csfo = K;
-Dsfo = 0;
+Dsfo = zeros(1,2);
 
 
-
+out = sim('FinalSimModel');
 
 

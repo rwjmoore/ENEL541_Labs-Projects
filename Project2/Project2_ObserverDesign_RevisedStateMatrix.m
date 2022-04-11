@@ -6,14 +6,16 @@
 b = [12]; %numerator coefficients
 a = [1 1.5 0];
 Ts = 0.05; % Sample Period in seconds
-% Gp_Total = tf(b, a); %continuous time tf
-% Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
-% [numz, denz] = tfdata(Gz_Total);
-% numz = cell2mat(numz); %convert to appropriate format (array)
-% denz = cell2mat(denz); 
-% [A,B,C,D] = tf2ss(numz, denz);
-A = [-1]
-sys = ss(A,B,C,D); 
+Gp_Total = tf(b, a); %continuous time tf
+Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
+[numz, denz] = tfdata(Gz_Total);
+numz = cell2mat(numz); %convert to appropriate format (array)
+denz = cell2mat(denz); 
+[A,B,C,D] = tf2ss(numz, denz);
+% A = [-1.9272 -0.9272; 1 0];
+% B = [0.0146 0.0143; 0 0];
+% C = [0 1];
+% D = 0;
 csys = canon(sys, 'companion'); 
 
             %check for observability
@@ -48,7 +50,6 @@ dens = cell2mat(dens);
 %tracking 
 Gpoles = pole(Gz_Total); 
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
-C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
 PoMag = 0.01;
 Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];

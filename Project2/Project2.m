@@ -1,10 +1,11 @@
+clear
 % %tf for the entire plant (including the power dynamics of the amplifier)
 % b = [1200]; %numerator for continuous tf of entire plant
 % a = [1 101.5 150 0]; %denominator for continuous tf of entire plant 
 
 %tf of plant without the power dynamics of the amplifier
 b = [12]; %numerator coefficients
-a = [1 1.5 0];
+a = [1 1.5 0 ];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
@@ -36,7 +37,7 @@ csys = canon(sys, 'companion');
 nums = cell2mat(nums); %convert to appropriate format (array)
 dens = cell2mat(dens); 
 [As, Bs, Cs, Ds] = tf2ss(nums, dens);
-
+CtSS = ss(As, Bs, Cs, Ds); 
 
 
 %this part of the script deals with the design of the discrete time
@@ -49,7 +50,7 @@ Gpoles = pole(Gz_Total);
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
 
 %Select pole placement of 0.85 radius for now (short transients).
-PoMag = 0.01;
+PoMag = 1;
 Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
 
 %place the new pole positions
@@ -69,16 +70,16 @@ tsim = out.tout;
 
 %system inputs 
 u = SimData{3}; 
-x0 = randn(2,1);
+% x0 = randn(2,1);
+x0 = [0 0];
 
 %actual system results (non observer)
-[y,tt,x] = lsim(sys,u,t,x0); %sys here is the discrete time ss of the plant
-
+[y,tt,x] = lsim(CtSS,u,t,x0); %sys here is the discrete time ss of the plant
 %observer results
 xobs0 = zeros(2,1);
 [yobs,tt,xobs] = lsim(DishObs,[u y],t,xobs0);
 
-figure();
+figure(); grid on; hold on;
 subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("Observer Out"); legend('Observer', 'Real');
 
 subplot(122); plot(tt,yobs(:,2), tt, x(:,2)); title("Observer Out"); legend('Observer', 'Real');

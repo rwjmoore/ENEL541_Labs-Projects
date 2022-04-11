@@ -1,10 +1,11 @@
+clear
 % %tf for the entire plant (including the power dynamics of the amplifier)
 % b = [1200]; %numerator for continuous tf of entire plant
 % a = [1 101.5 150 0]; %denominator for continuous tf of entire plant 
 
 %tf of plant without the power dynamics of the amplifier
 b = [12]; %numerator coefficients
-a = [1 1.5 0];
+a = [1 1.5 0 ];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
@@ -49,15 +50,39 @@ Gpoles = pole(Gz_Total);
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
 
 %Select pole placement of 0.85 radius for now (short transients).
-
-PoMag = 0.85;
+PoMag = 0.01;
 Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
+
 %place the new pole positions
 L = place(A',C',Po)';
-DishObs = ss(A-L*C,[B-L*D, L],eye(1),zeros(1,1),Ts);
-%test the observer 
-x0 = randn(2,1);
-[y,tt,x] = lsim(Gz_Total,u,t,x0); %actual data
+%notice that C is all ones and D is zero, meaning the output of observer
+%tracks the states
+DishObs = ss(A-L*C,[B-L*D, L],eye(2),zeros(2,2),Ts); %Observer system
 
-xobs0 = zeros(4,1);
-[yobs,tt,xobs] = lsim(PendObs,[u y],t,xobs0)
+%RUN Project2_Observer 
+out = sim('Project2_Observer');
+
+%test the observer 
+tsim = out.tout;
+
+
+[SimData, t] = SampleDataStream(out, Ts);
+
+%system inputs 
+u = SimData{3}; 
+x0 = randn(2,1);
+
+%actual system results (non observer)
+[y,tt,x] = lsim(sys,u,t,x0); %sys here is the discrete time ss of the plant
+figure;
+plot(y);
+%observer results
+% xobs0 = zeros(2,1);
+% [yobs,tt,xobs] = lsim(DishObs,[u y],t,xobs0);
+% 
+% figure();
+% subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("Observer Out"); legend('Observer', 'Real');
+% 
+% subplot(122); plot(tt,yobs(:,2), tt, x(:,2)); title("Observer Out"); legend('Observer', 'Real');
+
+
