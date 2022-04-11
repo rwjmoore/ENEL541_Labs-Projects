@@ -29,6 +29,15 @@ A = sys.A;
 B = sys.B; 
 C = sys.C;
 D = sys.D;
+
+%here we create the continuous time state space of the plant to be used in
+%the simulink model 
+[nums, dens] = tfdata(Gp_Total);
+nums = cell2mat(nums); %convert to appropriate format (array)
+dens = cell2mat(dens); 
+[As, Bs, Cs, Ds] = tf2ss(nums, dens);
+
+
 %
 %-------------------------------------------------------------------------
 % end sys
@@ -44,7 +53,7 @@ L = place(A',C',Po)';
 % you must set these parameters 
 q1 = 1000;
 q2 = 1000;
-R = 10;
+R = 1;
 
 % call dlqr to compute the state feedback gain
 Q = diag([q1 q2]);
