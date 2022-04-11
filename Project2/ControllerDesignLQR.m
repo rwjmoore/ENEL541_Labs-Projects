@@ -13,29 +13,30 @@ DampingGain = 3;             %Fixed April 4th by Andrey
 %
 %tf of plant without the power dynamics of the amplifier
 % TODO: Ask Randy for updated plant system model 
+%tf of plant without the power dynamics of the amplifier
 b = [12]; %numerator coefficients
 a = [1 1.5 0];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
-[numz, denz] = tfdata(Gz_Total);
-numz = cell2mat(numz); %convert to appropriate format (array)
-denz = cell2mat(denz); 
-[A,B,C,D] = tf2ss(numz, denz);
-sys = ss(A,B,C,D); 
+[nums, dens] = tfdata(Gp_Total);
+nums = cell2mat(nums); %convert to appropriate format (array)
+dens = cell2mat(dens); 
+[A,B,C,D] = tf2ss(nums, dens);
+sys = ss(A,B,C,D); %continuous state space model of the satellite dish
+
+sys = c2d(sys, Ts);% discrete state space model of satellite dish
+A = sys.A;
+B = sys.B; 
+C = sys.C;
+D = sys.D;
 %
 %-------------------------------------------------------------------------
 % end sys
 
-sysd = c2d(sys,Ts);
-A = sysd.a;
-B = sysd.b;
-C = sysd.c;
-D = sysd.d;
-
 
 % Default Observer Poles
-PoMag = 0.85;
+PoMag = 0.3;
 % TODO: get a better Observer Pole
 Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4)];
 

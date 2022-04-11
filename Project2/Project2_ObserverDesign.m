@@ -8,11 +8,17 @@ a = [1 1.5 0];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
-[numz, denz] = tfdata(Gz_Total);
-numz = cell2mat(numz); %convert to appropriate format (array)
-denz = cell2mat(denz); 
-[A,B,C,D] = tf2ss(numz, denz);
-sys = ss(A,B,C,D); 
+[nums, dens] = tfdata(Gp_Total);
+nums = cell2mat(nums); %convert to appropriate format (array)
+dens = cell2mat(dens); 
+[A,B,C,D] = tf2ss(nums, dens);
+sys = ss(A,B,C,D); %continuous state space model of the satellite dish
+
+sys = c2d(sys, Ts);% discrete state space model of satellite dish
+A = sys.A;
+B = sys.B; 
+C = sys.C;
+D = sys.D;
 csys = canon(sys, 'companion'); 
 
             %check for observability
@@ -49,8 +55,8 @@ Gpoles = pole(Gz_Total);
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); 
 % C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
-PoMag = 0.60;
-Po = PoMag * [exp(j*pi/100) exp(-j*pi/100)];
+PoMag = 0.85;
+Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
 plot(Po, 'gx', 'markersize',16)
 legend('Plant Pole', 'Observer Pole')
 %place the new pole positions
