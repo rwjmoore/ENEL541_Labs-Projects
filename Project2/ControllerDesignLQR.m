@@ -51,9 +51,9 @@ Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4)];
 L = place(A',C',Po)';
 
 % you must set these parameters 
-q1 = 1000;
-q2 = 1000;
-R = 1;
+q1 = 10900;
+q2 = 10900;
+R = 36;
 
 % call dlqr to compute the state feedback gain
 Q = diag([q1 q2]);
@@ -66,6 +66,11 @@ Csfo = K;
 Dsfo = zeros(1,2);
 
 
+%input scaling to reduce steady state error 
+N = -(C*(A-B*K)^-1*B)^-1;
+N = 1/N(1);
+N = 12.5/13.14;
+N = 1;
 out = sim('FinalSimModel');
 
 

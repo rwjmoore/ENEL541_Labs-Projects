@@ -57,7 +57,7 @@ Gpoles(2) = 0.927743486328552 + 0*j;
 figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); hold on;
 % C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
-PoMag = 0.85;
+PoMag = 0.01;
 Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
 plot(Po, 'gx', 'markersize',16)
 legend('Plant Pole', 'Observer Pole')
@@ -82,13 +82,17 @@ x0 = randn(2,1);
 %actual system results (non observer)
 [y,tt,x] = lsim(sys,u,t,x0); %sys here is the discrete time ss of the plant
 
+%adding in noise to the vector y to simulate encoder noise 
+% noisy_y = wgn(length(y),1,1);
+% noisy_y = noisy_y + y;
+
 %observer results
 xobs0 = zeros(2,1);
 [yobs,tt,xobs] = lsim(DishObs,[u y],t,xobs0);
 
 
 figure();
-subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("Observer Out"); legend('Observer', 'Real');
-subplot(122); plot(tt,yobs(:,2), tt, x(:,2)); title("Observer Out"); legend('Observer', 'Real');
+subplot(121); plot(tt,yobs(:,1), tt, x(:,1)); title("State of System vs Observer Output: State 1"); legend('Observer', 'Real');
+subplot(122); plot(tt,yobs(:,2), tt, x(:,2)); title("State of System vs Observer Output: State 2"); legend('Observer', 'Real');
 
 
