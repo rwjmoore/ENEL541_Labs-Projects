@@ -46,16 +46,16 @@ dens = cell2mat(dens);
 % Default Observer Poles
 PoMag = 0.01;
 % TODO: get a better Observer Pole
-Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4) 0.5];
+Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4) 1];
 
 L = place(A',C',Po)';
 
 % you must set these parameters 
-val = 1;
+val = 10500;
 q1 = val;
 q2 = val;
 q3 = val;
-R = 0.001;
+R = 0.5;
 
 % call dlqr to compute the state feedback gain
 Q = diag([q1 q2 q3]);
@@ -73,6 +73,6 @@ N = -(C*(A-B*K)^-1*B)^-1;
 N = 1/N(1);
 N = 12.5/13.14;
 N = 1;
-out = sim('FinalSimModel');
+out = sim('FinalSimModel_Integrator');
 
 

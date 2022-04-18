@@ -51,9 +51,9 @@ Po = PoMag * [exp(1i*pi/4), exp(-1i*pi/4)];
 L = place(A',C',Po)';
 
 % you must set these parameters 
-q1 = 10900;
-q2 = 10900;
-R = 36;
+q1 = 10500;
+q2 = 10500;
+R = 40;
 
 % call dlqr to compute the state feedback gain
 Q = diag([q1 q2]);
@@ -66,11 +66,26 @@ Csfo = K;
 Dsfo = zeros(1,2);
 
 
-%input scaling to reduce steady state error 
-N = -(C*(A-B*K)^-1*B)^-1;
-N = 1/N(1);
-N = 12.5/13.14;
-N = 1;
-out = sim('FinalSimModel');
+%input scaling to reduce steady state error ... enter loop that determines
+%best one 
+N =0; 
+N_count = []; 
+er = [100]; 
+er1 = [100];
+
+while ((er > 0.25 | er < -0.25) |(er1 > 0.25 | er1 < -0.25)) & N < 2 
+    out = sim('FinalSimModel');
+    tsim = out.tout;
+    [SimData, t] = SampleDataStream(out, Ts);
+    
+    %system inputs 
+    u = SimData{4}; %how do we know what our first states are? 
+    y = SimData{2};%output
+    error = u-y; 
+    er(end+1) = error(800); 
+    er1(end+1) = error(300); 
+    N_count(end+1) = N; 
+    N= N + 0.01; 
+    end 
 
 

@@ -4,7 +4,7 @@
 
 %tf of plant without the power dynamics of the amplifier
 b = [12]; %numerator coefficients
-a = [1 1.5 0];
+a = [1 1.5 0 0];
 Ts = 0.05; % Sample Period in seconds
 Gp_Total = tf(b, a); %continuous time tf
 Gz_Total = c2d(Gp_Total, Ts); %Discrete time tf
@@ -58,14 +58,14 @@ figure; zgrid on; plot(Gpoles, 'rx', 'markersize', 16); hold on;
 % C = [0 1];
 %Select pole placement of 0.85 radius for now (short transients).
 PoMag = 0.01;
-Po = PoMag * [exp(j*pi/4) exp(-j*pi/4)];
+Po = PoMag * [exp(j*pi/4) exp(-j*pi/4) 0.2];
 plot(Po, 'gx', 'markersize',16)
 legend('Plant Pole', 'Observer Pole')
 %place the new pole positions
 L = place(A',C',Po)';
 %notice that C is all ones and D is zero, meaning the output of observer
 %tracks the states
-DishObs = ss(A-L*C,[B-L*D, L],eye(2),zeros(2,2),Ts); %Observer system
+DishObs = ss(A-L*C,[B-L*D, L],eye(3),zeros(3,2),Ts); %Observer system
 
 %RUN Project2_Observer 
 out = sim('Project2_Observer');
@@ -76,18 +76,18 @@ tsim = out.tout;
 
 %system inputs 
 u = SimData{3}; %how do we know what our first states are? 
-x0 = randn(2,1); 
+x0 = randn(3,1); 
 %x0 = [1000000 1];
 
 %actual system results (non observer)
 [y,tt,x] = lsim(sys,u,t,x0); %sys here is the discrete time ss of the plant
 
 %adding in noise to the vector y to simulate encoder noise 
-noisy_y = wgn(length(y),1,1);
+noisy_y = wgn(length(y),1,0.05);
 noisy_y = noisy_y + y;
 
 %observer results
-xobs0 = zeros(2,1);
+xobs0 = zeros(3,1);
 [yobs,tt,xobs] = lsim(DishObs,[u noisy_y],t,xobs0);
 
 
